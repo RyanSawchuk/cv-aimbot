@@ -1,5 +1,8 @@
 # Destiny 2 Computer Vision Aimbot POC
 
+## Project Motivation
+Temp
+
 ## Funciontal Overview
 
 ### Detection
@@ -32,7 +35,7 @@ Temp
 Temp
 
 
-## Future Work
+## Potential Improvements and Future Work
 Temp
 
 

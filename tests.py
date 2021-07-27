@@ -13,7 +13,7 @@ import aimbot
 
 
 def main():
-
+    single_frame()
     pass
 
 
@@ -21,18 +21,17 @@ def check_recording_fps():
     pass
 
 
-def single_frame_test():
-    #model = models.load_model("PyTorch-YOLOv3/config/yolov3.cfg", "PyTorch-YOLOv3/yolov3.weights")
-    model = models.load_model("PyTorch-YOLOv3/config/yolov3-tiny.cfg", "PyTorch-YOLOv3/yolov3-tiny.weights")
+def single_frame():
+    model = models.load_model("PyTorch-YOLOv3/config/yolov3.cfg", "PyTorch-YOLOv3/yolov3.weights")
+    #model = models.load_model("PyTorch-YOLOv3/config/yolov3-tiny.cfg", "PyTorch-YOLOv3/yolov3-tiny.weights")
 
     frame = cv2.imread(sys.argv[1])
-    print(frame.shape)
 
     start = time.time()
 
-    frame = aimbot.process_frame(model, frame)
+    frame, target = aimbot.process_frame(model, frame)
 
-    print(time.time() - start)
+    cv2.imwrite(str(sys.argv[2]), frame)
 
     cv2.imshow('frame', frame)
     cv2.waitKey(0)

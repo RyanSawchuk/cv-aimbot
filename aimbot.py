@@ -9,9 +9,11 @@ import time
 import pyautogui
 import time
 from PIL import Image
+from mss import mss
 
 from pytorchyolo import detect, models
 
+pyautogui.PAUSE = 0
 
 def usage():
     print(f'Usage: ')
@@ -34,10 +36,13 @@ def capture_screen(fps):
     sw = pyautogui.size()[0] * 2
     sh = pyautogui.size()[1] * 2
 
-    out = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc(*'mp4v'), fps, (sw, sh))
+    out = cv2.VideoWriter('output/live_output.mp4', cv2.VideoWriter_fourcc(*'mp4v'), fps, (sw, sh))
 
     sc = mss()
     rect = {"left": 0, "top": 0, "width": sw/2, "height": sh/2}
+    
+    rtime = 0
+    epoch = 0
 
     while True:
         start = time.time()
@@ -47,24 +52,38 @@ def capture_screen(fps):
         
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        frame = process_frame(model, frame)
+        frame, target = process_frame(model, frame)
 
-        print(time.time() - start)
+        rtime += time.time() - start
+        epoch += 1
 
         # update mouse positißn
+        if target is not None:
+            # check target bounds
+            pyautogui.moveTo(target[0], target[1])
+            #pyautogui.move(12,12)
+            pyautogui.click()
 
         out.write(frame)
-        
+
+        if rtime > 3 * 60 * 60:
+            break
+    
+    print(f'FPS: {60 / (rtime / epoch)}')
     out.release()
 
 
 def process_frame(model, frame):
 
     scale = 1
+    _frame = frame
     #_frame = preprocess_frame(frame, scale)
-    _frame = cv2.resize(frame, (int(frame.shape[1] / scale), int(frame.shape[0] / scale)), interpolation = cv2.INTER_AREA)
+    #_frame = cv2.resize(frame, (int(frame.shape[1] / scale), int(frame.shape[0] / scale)), interpolation = cv2.INTER_AREA)
 
     boxes = detect.detect_image(model, _frame)
+
+    max_bb_area = 0#int(frame.shape[0] * frame.shape[1])
+    target = None
 
     for box in boxes:
         if box[5] == 0:
@@ -76,7 +95,15 @@ def process_frame(model, frame):
             cv2.circle(frame, head_circle_center(xA, yA, xB, yB, 0.1), head_circle_radius(xA, yA, xB, yB), (0, 0, 255), 2)
             cv2.putText(frame, f"{box[4]: .2f}", (xA,yA-10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
 
-    return frame
+            if (xB - xA) * (yB - yA) > max_bb_area:
+                max_bb_area = (xB - xA) * (yB - yA)
+                target = head_circle_center(xA, yA, xB, yB, 0.1)
+
+    if target is not None:
+        cv2.circle(frame, target, 15, (60,150,230), 2)
+        cv2.circle(frame, target, 3, (60,150,230), 2)
+
+    return frame, target
 
 
 def head_circle_radius(xA, yA, xB, yB):
@@ -98,7 +125,7 @@ def preprocess_frame(frame, scale):
 def process_video(filename):
 
     cap = cv2.VideoCapture(filename)
-    out = cv2.VideoWriter(f'output/{sys.argv[2]}.mp4', cv2.VideoWriter_fourcc(*'mp4v'), int(cap.get(cv2.CAP_PROP_FPS)), (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
+    out = cv2.VideoWriter(f'output/{sys.argv[2]}', cv2.VideoWriter_fourcc(*'mp4v'), int(cap.get(cv2.CAP_PROP_FPS)), (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
 
     model = models.load_model("PyTorch-YOLOv3/config/yolov3.cfg", "PyTorch-YOLOv3/yolov3.weights")
     #model = models.load_model("PyTorch-YOLOv3/config/yolov3-tiny.cfg", "PyTorch-YOLOv3/yolov3-tiny.weights")
@@ -109,7 +136,7 @@ def process_video(filename):
         if not ret:
             break
 
-        frame = process_frame(model, frame)
+        frame, target = process_frame(model, frame)
         out.write(frame)
 
     out.release()
@@ -159,6 +186,8 @@ def filter(model, tracker, frame):
         cv2.circle(frame, head_circle_center(xA, yA, xB, yB, 0.1), head_circle_radius(xA, yA, xB, yB), (0, 0, 255), 2)
         #cv2.putText(frame, f"{box[4]: .2f}", (xA,yA-10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
         cv2.putText(frame, f"Entity: {i+1}", (xA,yA-10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+
+        # find and return priority target
 
     return frame
 
