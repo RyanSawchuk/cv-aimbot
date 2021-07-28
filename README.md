@@ -7,7 +7,7 @@ The primary motivation for this project is a proof of concept to demonstrate tha
 
 
 ## Disclaimer
-I have no intent on productionizationizing and distributing this aimbot. I have no intent of using this aimbot in actual game play as the the computational requirements and performance level will be impractical. 
+I have no intent on productionizing and distributing this aimbot. I have no intent of using this aimbot in actual game play as the the computational requirements and performance level will be impractical. 
 
 
 ## Funciontal Overview
