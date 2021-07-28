@@ -13,12 +13,21 @@ import aimbot
 
 
 def main():
-    single_frame()
+    #single_frame()
+    mouse_positioning()
     pass
 
 
 def check_recording_fps():
     pass
+
+def mouse_positioning():
+    time.sleep(3)
+    pyautogui.moveTo(120, 120)
+    time.sleep(1)
+    pyautogui.moveTo(500, 500)
+    time.sleep(1)
+    pyautogui.moveTo(900, 500)
 
 
 def single_frame():

@@ -47,6 +47,8 @@ def capture_screen(fps):
     while True:
         start = time.time()
         
+        # Pillow: image grab
+        # TODO: grab frame from specified window
         frame = sc.grab(rect)
         frame = np.asarray(Image.frombytes("RGB", frame.size, frame.bgra, "raw", "BGRX"))#.transpose(1,0,2)
         
@@ -100,6 +102,7 @@ def process_frame(model, frame):
                 target = head_circle_center(xA, yA, xB, yB, 0.1)
 
     if target is not None:
+        # TODO: drawmarker()
         cv2.circle(frame, target, 15, (60,150,230), 2)
         cv2.circle(frame, target, 3, (60,150,230), 2)
 
@@ -116,6 +119,7 @@ def head_circle_center(xA, yA, xB, yB, offset):
 
 def preprocess_frame(frame, scale):
 
+    # TODO: hsv thresholding
     #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     frame = cv2.resize(frame, (int(frame.shape[1] / scale), int(frame.shape[0] / scale)), interpolation = cv2.INTER_AREA)
 
