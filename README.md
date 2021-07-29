@@ -13,7 +13,8 @@ I have no intent on productionizing and distributing this aimbot. I have no inte
 ## Funciontal Overview
 
 ### Detection
-Temp
+
+![Character Model Detection](images/example.png "Character Model Detection")
 
 ### Tracking
 Temp

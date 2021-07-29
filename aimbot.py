@@ -26,18 +26,21 @@ class AimBot:
     active_targets = None
     frame = None
     action_history = None
+    start_time = 0
 
 
     def __init__(self):
         self.lock = Lock()
         self.active_targets = []
         self.action_history = []
+        self.start_time = time()
 
     
     def shoot(self, target):
         # TODO: PyDirectInput for DirectX on windows
         pyautogui.moveTo(target[0], target[1])
         pyautogui.click()
+        self.action_history.append((time() - self.start_time, target))
     
 
     def start(self):
@@ -58,6 +61,7 @@ class AimBot:
 
     def run(self):
         while self.running:
+            # TODO: shoot active target
             pass
 
 
