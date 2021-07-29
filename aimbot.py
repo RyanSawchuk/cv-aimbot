@@ -4,6 +4,7 @@ warnings.filterwarnings("ignore")
 import os, sys
 
 import pyautogui
+import cv2
 
 from time import time, sleep
 from threading import Thread, Lock
@@ -33,8 +34,10 @@ class AimBot:
         self.action_history = []
 
     
-    def target_player(self):
-        pass
+    def shoot(self, target):
+        # TODO: PyDirectInput for DirectX on windows
+        pyautogui.moveTo(target[0], target[1])
+        pyautogui.click()
     
 
     def start(self):
@@ -75,9 +78,16 @@ def main():
 
     capture.start()
     detector.start()
+    aimbot.start()
 
     rtime = 0
     epoch = 0
+
+    record = True
+
+    if record:
+        fps = 23 #15 - 30
+        out = cv2.VideoWriter('output/live_output1.mp4', cv2.VideoWriter_fourcc(*'mp4v'), fps, (sw*2, sh*2))
 
     while True:
         
@@ -88,10 +98,16 @@ def main():
         
         detector.update(capture.frame)
 
+        # TODO: align bounding boxes with the correct frame OR reduce detect time by x10
+        target = vision.get_priority_target(detector.boxes)
         frame = vision.draw_bounding_boxes(detector.frame, detector.boxes)
-        frame = vision.draw_crosshair(frame, vision.get_priority_target(detector.boxes))
+        frame = vision.draw_crosshair(frame, target)
 
         # TODO: bot actions
+        #aimbot.shoot(target)
+
+        if record:
+            out.write(frame)
 
         rtime += time() - start
         epoch += 1
@@ -101,7 +117,12 @@ def main():
     
     capture.stop()
     detector.stop()
+    aimbot.stop()
+
+    out.release()
+
     print(f'FPS: {1 / (rtime / epoch)}')
+
 
 if __name__ == '__main__':
     main()

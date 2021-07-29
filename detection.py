@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from threading import Thread, Lock
+from time import time
 
 from pytorchyolo import detect, models
 
@@ -40,17 +41,25 @@ class Detection:
 
 
     def run(self):
-        
+        epoch = 0
+        rtime = 0
         while self.running:
             if self.frame is not None:
+                start = time()
                 boxes = detect.detect_image(self.model, self.frame)
 
                 self.lock.acquire()
                 self.boxes = boxes
                 self.lock.release()
+                
+                rtime += time() - start
+                epoch += 1
+        print(f'D: {epoch}, {rtime/epoch}')
 
     # TODO: HSV Thresholding
 
     # TODO: detect uising matchTemplate
+
+    
 
     # TODO: detect using cascade filters

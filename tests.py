@@ -7,15 +7,49 @@ import numpy as np
 import time
 import pyautogui
 
-from pytorchyolo import detect, models
+#from pytorchyolo import detect, models
 
-import aimbot
+from threading import Thread, Lock
+
+from gamecapture import GameCapture
+#from detection import Detection
+from vision import Vision
+from utilities import Utilities
 
 
 def main():
     #single_frame()
-    mouse_positioning()
+    #mouse_positioning()
+    hsv_tool()
     pass
+
+
+def hsv_tool():
+
+    from hsvfilter import HsvFilter, HsvPannel
+
+    pannel = HsvPannel()
+
+    pannel.init_control_gui()
+
+    hsv_filter = HsvFilter(0, 180, 129, 15, 229, 243, 143, 0, 67, 0)
+    
+    sw = pyautogui.size()[0]
+    sh = pyautogui.size()[1]
+    cap = GameCapture(sw/2, sh/2)
+
+    while True:
+        frame = cap.capture_frame_by_PIL()
+
+        hsv_filter = pannel.get_hsv_filter_from_controls()
+
+        frame = pannel.apply_hsv_filter(frame, hsv_filter)
+
+        cv2.imshow('Processed', frame)
+        if cv2.waitKey(1) == ord('q'):
+            cv2.destroyAllWindows()
+            break
+
 
 
 def check_recording_fps():
