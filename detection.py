@@ -13,7 +13,7 @@ class Detection:
     model = None
     frame = None
     boxes = None
-
+    detect_func = None
 
     def __init__(self):
 
@@ -22,6 +22,7 @@ class Detection:
 
         self.lock = Lock()
         self.boxes = []
+        self.detect_func = self.detect_YOLOv3
     
 
     def start(self):
@@ -41,25 +42,21 @@ class Detection:
 
 
     def run(self):
-        epoch = 0
-        rtime = 0
         while self.running:
             if self.frame is not None:
-                start = time()
-                boxes = detect.detect_image(self.model, self.frame)
+                boxes = self.detect_func(self.frame)
 
                 self.lock.acquire()
                 self.boxes = boxes
                 self.lock.release()
-                
-                rtime += time() - start
-                epoch += 1
-        print(f'D: {epoch}, {rtime/epoch}')
+
+
+    def detect_YOLOv3(self, frame):
+        return detect.detect_image(self.model, frame)
+
 
     # TODO: HSV Thresholding
 
     # TODO: detect uising matchTemplate
-
-    
 
     # TODO: detect using cascade filters

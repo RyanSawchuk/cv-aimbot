@@ -15,6 +15,7 @@ class GameCapture:
     capture_area = None
     frame = None
     capture_frame = None
+    frame_number = 0
     
 
     def __init__(self, w, h):
@@ -35,23 +36,17 @@ class GameCapture:
 
 
     def run(self):
-        epoch = 0
-        rtime = 0
+        self.frame_number = 0
         while self.running:
-            start = time()
             frame = self.capture_frame()
 
             self.lock.acquire()
             self.frame = frame
+            self.frame_number += 1
             self.lock.release()
 
-            rtime += time() - start
-            epoch += 1
-        
-        print(f'C: {epoch}, {rtime/epoch}')
-
     
-    # TODO: ¿Could be faster
+    # TODO: Refactor
     def capture_frame_by_PIL(self):
         frame = self.screen_capture.grab(self.capture_area)
         frame = np.asarray(Image.frombytes("RGB", frame.size, frame.bgra, "raw", "BGRX"))#.transpose(1,0,2)
@@ -63,3 +58,6 @@ class GameCapture:
 
 
     # TODO: Capture frames using win32gui
+
+
+    # TODO: Read frames from capture card
