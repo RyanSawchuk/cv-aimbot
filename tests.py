@@ -7,20 +7,20 @@ import numpy as np
 import time
 import pyautogui
 
-#from pytorchyolo import detect, models
+from pytorchyolo import detect, models
 
 from threading import Thread, Lock
 
 from gamecapture import GameCapture
-#from detection import Detection
+from detection import Detection
 from vision import Vision
 from utilities import Utilities
 
 
 def main():
-    #single_frame()
+    single_frame()
     #mouse_positioning()
-    hsv_tool()
+    #hsv_tool()
     pass
 
 
@@ -68,17 +68,25 @@ def single_frame():
     model = models.load_model("PyTorch-YOLOv3/config/yolov3.cfg", "PyTorch-YOLOv3/yolov3.weights")
     #model = models.load_model("PyTorch-YOLOv3/config/yolov3-tiny.cfg", "PyTorch-YOLOv3/yolov3-tiny.weights")
 
+    detector = Detection()
+    detector.model = model
+
+    vision = Vision()
+
     frame = cv2.imread(sys.argv[1])
 
-    start = time.time()
+    #frame, target = aimbot.process_frame(model, frame)
+    boxes = detector.detect_YOLOv3(frame)
 
-    frame, target = aimbot.process_frame(model, frame)
+    target = vision.get_priority_target(boxes)
+    frame = vision.draw_bounding_boxes(frame, boxes)
+    frame = vision.draw_crosshair(frame, target)
 
     cv2.imwrite(str(sys.argv[2]), frame)
-
-    cv2.imshow('frame', frame)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    
+    #cv2.imshow('frame', frame)
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
