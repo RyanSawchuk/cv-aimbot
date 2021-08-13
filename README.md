@@ -13,7 +13,7 @@ I have no intent on productionizing and distributing this aimbot. I have no inte
 ## Functional Overview
 
 ## Screen Capturing
-The screen is captured using a loop that repeatedly takes a screen shot of the active screen. This approach us capable of recording the screen at `<= 30` fps when the screen capture component is running on it's own thread. A better approach I plan on implementing uses the Windows GUI API to read frames directly from the game window. The Windows GUI API approach can capture frames at a rate of `~30` fps when the screen capture component is running on it's own thread. Furthermore, I intend on using a capture card to directly record frames at `>= 60` fps. The capture card approach is by far the most effective but has very demanding hardware and computational requirements. 
+The screen is captured using a loop that repeatedly takes a screen shot of the active screen. This approach is capable of recording the screen at `<= 30` fps when the screen capture component is running on it's own thread. A better approach I plan on implementing uses the Windows GUI API to read frames directly from the game window. The Windows GUI API approach can capture frames at a rate of `~30` fps when the screen capture component is running on it's own thread. Furthermore, I intend on using a capture card to directly record frames at `>= 60` fps. The capture card approach is by far the most effective but has very demanding hardware and computational requirements. 
 
 
 ### Detection
