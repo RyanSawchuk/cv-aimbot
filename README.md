@@ -22,8 +22,9 @@ The screen is captured using a loop that repeatedly takes a screen shot of the a
 
 
 <figure class="video_container">
-  <iframe src="https://youtu.be/Zmm0KTelh1I" frameborder="0" allowfullscreen="true"> </iframe>
+  <iframe src="https://www.youtube.com/embed/Zmm0KTelh1I" frameborder="0" allowfullscreen="true"> </iframe>
 </figure>
+
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/Zmm0KTelh1I" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
