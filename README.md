@@ -20,7 +20,8 @@ The screen is captured using a loop that repeatedly takes a screen shot of the a
 
 ![Character Model Detection](images/example.png "Character Model Detection")
 
-![Character Model Detection and Tracking](images/test2.png "Character Model Detection and Tracking")
+
+![Character Model Detection and Tracking](images/test2.gif "Character Model Detection and Tracking")
 
 
 
@@ -33,7 +34,7 @@ The [Lucas–Kanade method](https://en.wikipedia.org/wiki/Lucas–Kanade_method)
 
 ### Enemy Prioritization
 
-![Target Prioritization](images/test2.gif "Target Prioritization")
+![Target Prioritization](images/example2.png "Target Prioritization")
 
 The priority target is the character model who's bounding box has the largest area. The bounding box area is a proxy for how close the character is to yourself. Character models with large bounding box areas tend to be close while character models with small bounding box areas tend to be far away. In comparison with tradisional aimbots, the distance between your character and every opposing character is calculated given the (x, y, z) coordinates of each character entity. The closest visible character is selected as the target.
 
