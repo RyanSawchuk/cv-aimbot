@@ -42,6 +42,7 @@ The priority target is the character model who's bounding box has the largest ar
 
 ### Enemy Targeting and Automated Mouse Input
 
+- direct x
 
 ## Hardware and Computational Requirements
 
