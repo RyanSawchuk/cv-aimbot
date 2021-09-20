@@ -3,7 +3,7 @@ import numpy as np
 from threading import Thread, Lock
 from time import time
 
-from pytorchyolo import detect, models
+#from pytorchyolo import detect, models
 
 class Detection:
 

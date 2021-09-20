@@ -7,7 +7,10 @@ import numpy as np
 import time
 import pyautogui
 
-from pytorchyolo import detect, models
+import win32gui
+import win32api
+
+#from pytorchyolo import detect, models
 
 from threading import Thread, Lock
 
@@ -18,10 +21,35 @@ from utilities import Utilities
 
 
 def main():
-    single_frame()
+    #single_frame()
     #mouse_positioning()
     #hsv_tool()
+
+    record_window('Play - Stadia - Google Chrome', 'out')
     pass
+
+
+def record_window(windowname, filename):
+
+    sw = pyautogui.size()[0] #win32api.GetSystemMetrics(0)
+    sh = pyautogui.size()[1] #win32api.GetSystemMetrics(0)
+
+    print(sw, sh)
+
+    cap = GameCapture(sw, sh, windowname, 'WIN32GUI')
+    win32gui.SetForegroundWindow( win32gui.FindWindow(None, windowname))
+
+    path = f"C:\\Users\\Ryan Sawchuk\\git\\destiny2-cv-aimbot-poc\\output\\{filename}.mp4"
+    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+    writer = cv2.VideoWriter(path, fourcc, 30, (sw, sh))
+
+    for _ in range(180):
+
+        frame = cap.capture_frame()
+
+        writer.write(frame)
+    
+    writer.release()
 
 
 def hsv_tool():
@@ -49,7 +77,6 @@ def hsv_tool():
         if cv2.waitKey(1) == ord('q'):
             cv2.destroyAllWindows()
             break
-
 
 
 def check_recording_fps():

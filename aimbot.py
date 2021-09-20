@@ -16,6 +16,8 @@ from detection import Detection
 from vision import Vision
 from utilities import Utilities
 
+import win32gui
+
 pyautogui.PAUSE = 0
 
 
@@ -79,13 +81,14 @@ def main():
     sh = pyautogui.size()[1]
     
     #multi_thread(sw, sh)
+    wn = 'Play - Stadia - Google Chrome'
 
-    single_thread(sw, sh)
+    single_thread(sw, sh, wn)
 
 
-def single_thread(sw, sh):
+def single_thread(sw, sh, windowname):
 
-    capture = GameCapture(sw, sh)
+    capture = GameCapture(sw, sh, windowname, 'WIN32GUI')
     detector = Detection()
     vision = Vision()
     aimbot = AimBot()
@@ -98,8 +101,9 @@ def single_thread(sw, sh):
         out = cv2.VideoWriter(f'output/{args["record"]}-{num}.mp4', cv2.VideoWriter_fourcc(*'mp4v'), fps, (sw*2, sh*2))
     
     try:
+        win32gui.SetForegroundWindow(win32gui.FindWindow(None, windowname))
         while True:
-            frame = capture.capture_frame_by_PIL()
+            frame = capture.capture_frame()
 
             boxes = detector.detect_YOLOv3(frame)
 
@@ -125,7 +129,7 @@ def single_thread(sw, sh):
             f.write(str(action))
 
 
-def multi_thread(sw, sh):
+def multi_thread(sw, sh, windowname):
 
     capture = GameCapture(sw, sh)
     detector = Detection()
@@ -143,6 +147,7 @@ def multi_thread(sw, sh):
     aimbot.start()
 
     try:
+        win32gui.SetForegroundWindow(win32gui.FindWindow(None, windowname))
         while True:
             
             if capture.frame is None:
