@@ -23,6 +23,8 @@ The screen is captured using a loop that repeatedly takes a screen shot of the a
 
 ![Hitman3 Detection Example](https://youtu.be/Zdq4AugZsUg)
 
+https://youtu.be/Zdq4AugZsUg
+
 
 ![Character Model Detection and Tracking](images/test2.gif "Character Model Detection and Tracking")
 
