@@ -4,13 +4,13 @@ warnings.filterwarnings("ignore")
 import os, sys
 import cv2
 import numpy as np
+import pandas as pd
 import time
 import pyautogui
 
 import win32gui
 import win32api
-
-#from pytorchyolo import detect, models
+import torch
 
 from threading import Thread, Lock
 
@@ -19,13 +19,15 @@ from detection import Detection
 from vision import Vision
 from utilities import Utilities
 
-
 def main():
-    #single_frame()
-    #mouse_positioning()
-    #hsv_tool()
+    sw = pyautogui.size()[0] #win32api.GetSystemMetrics(0)
+    sh = pyautogui.size()[1] #win32api.GetSystemMetrics(0)
 
-    record_window('Play - Stadia - Google Chrome', 'out')
+    #Utilities.fps_test(sw, sh, 'Play - Stadia - Google Chrome')
+    Utilities.process_video('test0.mp4')
+
+    #record_window('Play - Stadia - Google Chrome', 'out')
+    #single_frame_yolov5()
     pass
 
 
@@ -39,17 +41,23 @@ def record_window(windowname, filename):
     cap = GameCapture(sw, sh, windowname, 'WIN32GUI')
     win32gui.SetForegroundWindow( win32gui.FindWindow(None, windowname))
 
-    path = f"C:\\Users\\Ryan Sawchuk\\git\\destiny2-cv-aimbot-poc\\output\\{filename}.mp4"
+    path = f"output\\{filename}.mp4"
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
-    writer = cv2.VideoWriter(path, fourcc, 30, (sw, sh))
+    
+    #fps = Utilities.fps_test(sw, sh, 'Play - Stadia - Google Chrome')
+    fps = 52
+    writer = cv2.VideoWriter(path, fourcc, fps, (sw, sh))
 
-    for _ in range(180):
+
+    start = time.time()
+    for _ in range(1800):
 
         frame = cap.capture_frame()
 
         writer.write(frame)
     
     writer.release()
+    print(f'FPS: {1800/(time.time() - start)}')
 
 
 def hsv_tool():
@@ -82,6 +90,7 @@ def hsv_tool():
 def check_recording_fps():
     pass
 
+
 def mouse_positioning():
     time.sleep(3)
     pyautogui.moveTo(120, 120)
@@ -91,29 +100,36 @@ def mouse_positioning():
     pyautogui.moveTo(900, 500)
 
 
-def single_frame():
-    model = models.load_model("PyTorch-YOLOv3/config/yolov3.cfg", "PyTorch-YOLOv3/yolov3.weights")
-    #model = models.load_model("PyTorch-YOLOv3/config/yolov3-tiny.cfg", "PyTorch-YOLOv3/yolov3-tiny.weights")
+def single_frame_yolov5():
 
-    detector = Detection()
-    detector.model = model
+    sw = pyautogui.size()[0] #win32api.GetSystemMetrics(0)
+    sh = pyautogui.size()[1] #win32api.GetSystemMetrics(0)
 
+    cap = GameCapture(sw, sh, 'Play - Stadia - Google Chrome', 'WIN32GUI')
     vision = Vision()
+    time.sleep(3)
 
-    frame = cv2.imread(sys.argv[1])
+    start = time.time()
 
-    #frame, target = aimbot.process_frame(model, frame)
-    boxes = detector.detect_YOLOv3(frame)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print(device)
 
-    target = vision.get_priority_target(boxes)
-    frame = vision.draw_bounding_boxes(frame, boxes)
+    #frame = cap.capture_frame()
+    frame = cv2.imread('data/warlock_fit2.png')
+    print(frame.shape)
+
+    model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True).to(device)
+
+    results = model(frame)
+
+    print(f'Time: {time.time() - start}')
+    print(results.pred[0].tolist())
+
+    target = vision.get_priority_target(results.pred[0].tolist())
+    frame = vision.draw_bounding_boxes(frame, results.pred[0].tolist())
     frame = vision.draw_crosshair(frame, target)
 
-    cv2.imwrite(str(sys.argv[2]), frame)
-    
-    #cv2.imshow('frame', frame)
-    #cv2.waitKey(0)
-    #cv2.destroyAllWindows()
+    cv2.imwrite('output/single_frame_y5.png', frame)
 
 
 if __name__ == '__main__':

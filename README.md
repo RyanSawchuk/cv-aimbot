@@ -25,7 +25,7 @@ The screen is captured using a loop that repeatedly takes a screen shot of the a
 
 
 
-This bot uses the [YOLOv3](https://pjreddie.com/darknet/yolo/) object detection model to detect humanoid figures in captured frames. This network was trained using real world photographs of various scenes containing many different types of objects, including humans. This model can be used to detect humanoid character models in video game screen captures. However this model does not functional perfectly in the context of Destiny 2 and will miss some characters. In practice, any object detection model trained on photographs of humans should work in a video game context that uses humanoid character models.
+This bot uses the [YOLOv5](https://pytorch.org/hub/ultralytics_yolov5/) object detection model to detect humanoid figures in captured frames. This network was trained using real world photographs of various scenes containing many different types of objects, including humans. This model can be used to detect humanoid character models in video game screen captures. However this model does not functional perfectly in the context of Destiny 2 and will miss some characters. In practice, any object detection model trained on photographs of humans should work in a video game context that uses humanoid character models.
 
 
 ### Tracking

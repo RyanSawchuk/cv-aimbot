@@ -2,14 +2,13 @@ import numpy as np
 import cv2
 from threading import Thread, Lock
 
-from mss import mss
 from PIL import Image
 from time import time
+#from mss import mss
 
 import win32gui
 import win32ui
 import win32con
-
 
 class GameCapture:
 
@@ -28,7 +27,6 @@ class GameCapture:
 
     def __init__(self, w, h, windowname = '', method = 'PIL'):
         self.lock = Lock()
-        self.screen_capture = mss()
         self.capture_area = {"left": 0, "top": 0, "width": w, "height": h}
         self.w = w
         self.h = h
@@ -36,6 +34,7 @@ class GameCapture:
 
         if method == 'PIL':
             self.capture_frame = self.capture_frame_by_PIL
+            self.screen_capture = mss()
         elif method == 'WIN32GUI':
             self.capture_frame = self.capture_frame_by_WIN32
         else:
@@ -65,8 +64,13 @@ class GameCapture:
             self.frame = frame
             self.frame_number += 1
             self.lock.release()
-
     
+
+    # PM install for d3dshot is broken
+    def capture_frame_byD3D(self):
+        pass
+    
+
     # TODO: Refactor
     def capture_frame_by_PIL(self):
         frame = self.screen_capture.grab(self.capture_area)

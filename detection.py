@@ -3,7 +3,7 @@ import numpy as np
 from threading import Thread, Lock
 from time import time
 
-#from pytorchyolo import detect, models
+import torch
 
 class Detection:
 
@@ -12,20 +12,22 @@ class Detection:
 
     model = None
     frame = None
-    boxes = None
-    detect_func = None
+    predictions = None
     tracker = None
 
     def __init__(self):
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True).to(device)
 
-        #self.model = models.load_model("PyTorch-YOLOv3/config/yolov3.cfg", "PyTorch-YOLOv3/yolov3.weights")
-        self.model = models.load_model("PyTorch-YOLOv3/config/yolov3-tiny.cfg", "PyTorch-YOLOv3/yolov3-tiny.weights")
         # TODO: fix version conflicts
         #self.tracker = cv2.legacy.MultiTracker_create()
         self.lock = Lock()
-        self.boxes = []
-        self.detect_func = self.detect_YOLOv3
+        self.predictions = []
     
+
+    def get_model_device(self):
+        return next(self.model.parameters()).device.type
+
 
     def start(self):
         self.running = True
@@ -46,16 +48,15 @@ class Detection:
     def run(self):
         while self.running:
             if self.frame is not None:
-                boxes = self.detect_func(self.frame)
+                predictions = self.detect(self.frame)
 
                 self.lock.acquire()
-                self.boxes = boxes
+                self.predictions = predictions
                 self.lock.release()
 
 
-    # TODO: refactor to use precompiled opencv implementation
-    def detect_YOLOv3(self, frame):
-        return detect.detect_image(self.model, frame)
+    def detect(self, frame):
+        return self.model(frame).pred[0].tolist()
 
 
     # TODO: refactor returned box format
@@ -63,12 +64,12 @@ class Detection:
 
         max_objects = 16
         success = False
-        boxes = None
+        predictions = None
         
         if len(self.tracker.getObjects()) == 0 or success is False:
-            boxes = self.detect.detect_image(self.model, frame)
+            predictions = self.detect.detect_image(self.model, frame)
 
-        for i, box in enumerate(boxes):
+        for i, box in enumerate(predictions):
             if i == max_objects:
                 break
 
@@ -80,13 +81,6 @@ class Detection:
             self.tracker.add(cv2.legacy.TrackerKCF_create(), frame, bbox)
     
         else:
-            success, boxes = self.tracker.update(frame)
+            success, predictions = self.tracker.update(frame)
         
-        return boxes
-
-
-    # TODO: HSV Thresholding
-
-    # TODO: detect using matchTemplate
-
-    # TODO: detect using cascade filters
+        return predictions

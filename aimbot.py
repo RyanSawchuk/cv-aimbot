@@ -80,8 +80,8 @@ def main():
     sw = pyautogui.size()[0]
     sh = pyautogui.size()[1]
     
-    #multi_thread(sw, sh)
     wn = 'Play - Stadia - Google Chrome'
+    #multi_thread(sw, sh, wn)
 
     single_thread(sw, sh, wn)
 
@@ -105,10 +105,10 @@ def single_thread(sw, sh, windowname):
         while True:
             frame = capture.capture_frame()
 
-            boxes = detector.detect_YOLOv3(frame)
+            predictions = detector.detect(frame)
 
-            target = vision.get_priority_target(boxes)
-            frame = vision.draw_bounding_boxes(frame, boxes)
+            target = vision.get_priority_target(predictions)
+            frame = vision.draw_bounding_boxes(frame, predictions)
             frame = vision.draw_crosshair(frame, target)
 
             if target is not None:
@@ -155,9 +155,9 @@ def multi_thread(sw, sh, windowname):
             
             detector.update(capture.frame)
 
-            # TODO: align bounding boxes with the correct frame OR reduce detect time by x10
-            target = vision.get_priority_target(detector.boxes)
-            frame = vision.draw_bounding_boxes(detector.frame, detector.boxes)
+            # TODO: align bounding predictions with the correct frame OR reduce detect time by x10
+            target = vision.get_priority_target(detector.predictions)
+            frame = vision.draw_bounding_boxes(detector.frame, detector.predictions)
             frame = vision.draw_crosshair(frame, target)
 
             if target is not None:
