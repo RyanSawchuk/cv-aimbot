@@ -21,6 +21,9 @@ The screen is captured using a loop that repeatedly takes a screen shot of the a
 ![Character Model Detection](images/example.png "Character Model Detection")
 
 
+![Hitman3 Detection Example](https://youtu.be/Zdq4AugZsUg)
+
+
 ![Character Model Detection and Tracking](images/test2.gif "Character Model Detection and Tracking")
 
 
