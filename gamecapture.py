@@ -4,7 +4,7 @@ from threading import Thread, Lock
 
 from PIL import Image
 from time import time
-from mss import mss
+#from mss import mss
 
 import win32gui
 import win32ui
@@ -25,7 +25,7 @@ class GameCapture:
     h = 0
     
 
-    def __init__(self, w, h, windowname = '', method = 'PIL'):
+    def __init__(self, w, h, windowname = '', method = 'WIN32GUI'):
         self.lock = Lock()
         self.capture_area = {"left": 0, "top": 0, "width": w, "height": h}
         self.w = w

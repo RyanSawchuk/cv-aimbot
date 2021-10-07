@@ -27,10 +27,10 @@ class Utilities:
         # C: 162, 0.08039550722381215
         # D: 13, 0.774630069732666
 
-        cap = GameCapture(w, h,  windowname, method)
+        cap = GameCapture(w, h, windowname, method)
         
         cap.start()
-        sleep(7)
+        sleep(5)
         cap.stop()
         
         print(f'FPS: {int(cap.frame_number / 3)}')
@@ -44,12 +44,11 @@ class Utilities:
         detector = Detection()
         vision = Vision()
 
-        rtime = 0
+        start = time()
 
-        for _ in range(12):
-            start = time()
+        for _ in range(32):
 
-            frame = capture.capture_frame_by_PIL()
+            frame = capture.capture_frame()
 
             boxes = detector.detect(frame)
 
@@ -57,9 +56,7 @@ class Utilities:
             frame = vision.draw_bounding_boxes(frame, boxes)
             frame = vision.draw_crosshair(frame, target)
 
-            rtime += time() - start
-
-        return int(12 / rtime)
+        return int(32 / (time() - start))
 
 
     # TODO: refactor
