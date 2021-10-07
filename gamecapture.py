@@ -4,7 +4,7 @@ from threading import Thread, Lock
 
 from PIL import Image
 from time import time
-#from mss import mss
+from mss import mss
 
 import win32gui
 import win32ui

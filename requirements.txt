@@ -1,6 +1,8 @@
-opencv-python==4.5.3.56
-PyAutoGUI==0.9.52
+torch==1.9.1
+PyAutoGUI==0.9.48
+pandas==1.2.4
+numpy==1.20.1
+pywin32==227
 mss==6.1.0
-numpy==1.19.5
-Pillow==8.3.1
-pytorchyolo==1.5.1
+Pillow==8.3.2
+win32gui==221.6
