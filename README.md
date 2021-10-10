@@ -15,17 +15,21 @@ For an overview of how this aimbot functions, see the [METHODOLOGY.md](https://g
 
 ### Prerequisites
 
-* ```Python3```
+* [Python3](https://www.anaconda.com/products/individual)
 * If using an Nvidia GPU: ```conda install pytorch torchvision torchaudio cudatoolkit=11.1 -c pytorch -c conda-forge```
   * [PyTorch Installation](https://pytorch.org/get-started/locally/)
 
 
 ### Installation
 
-1. Clone the repo
-   ```git clone https://github.com/RyanSawchuk/cv-aimbot.git```
-2. Install python packages
-   ```python -m pip install -r requirements.txt```
+1. Clone the repo: 
+   ```sh
+   git clone https://github.com/RyanSawchuk/cv-aimbot.git
+   ```
+2. Install python packages: 
+   ```sh
+   python -m pip install -r requirements.txt
+   ```
 
 
 ## Usage
