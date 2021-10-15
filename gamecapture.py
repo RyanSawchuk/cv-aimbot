@@ -4,7 +4,7 @@ from threading import Thread, Lock
 
 from PIL import Image
 from time import time
-#from mss import mss
+from mss import mss
 
 import win32gui
 import win32ui
@@ -54,9 +54,6 @@ class GameCapture:
     def run(self):
         self.frame_number = 0
 
-        if not self.windowname:
-            win32gui.SetForegroundWindow(self.windowname)
-        
         while self.running:
             frame = self.capture_frame()
 
@@ -71,7 +68,6 @@ class GameCapture:
         pass
     
 
-    # TODO: Refactor
     def capture_frame_by_PIL(self):
         frame = self.screen_capture.grab(self.capture_area)
         frame = np.asarray(Image.frombytes("RGB", frame.size, frame.bgra, "raw", "BGRX"))#.transpose(1,0,2)
@@ -79,10 +75,6 @@ class GameCapture:
         return frame
 
 
-    # TODO: Capture frames using Quartz
-
-
-    # TODO: Capture frames using win32gui
     def capture_frame_by_WIN32(self):
 
         #hwnd = win32gui.FindWindow(None, self.windowname)

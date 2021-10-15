@@ -17,7 +17,7 @@ class Detection:
 
     def __init__(self):
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True).to(device)
+        self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True, verbose=False).to(device)
 
         # TODO: fix version conflicts
         #self.tracker = cv2.legacy.MultiTracker_create()

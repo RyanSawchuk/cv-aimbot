@@ -4,14 +4,10 @@
 The primary motivation for this project is a proof of concept to demonstrate that a computer vision approach for an aimbot is possible for cloud hosted games. The secondary motivation for this project is to exercise my programming skills in a computer vision context. 
 
 
-## Disclaimer
-I have no intent on productionizing and distributing this aimbot. I have no intent of using this aimbot in actual game play as the the computational requirements and performance level will be impractical. 
-
-
 ## Functional Overview
 
 ### Screen Capturing
-The screen is captured using a loop that repeatedly takes a screen shot of the active screen. This approach is capable of recording the screen at `<= 30` fps when the screen capture component is running on it's own thread. A better approach I plan on implementing uses the Windows GUI API to read frames directly from the game window. The Windows GUI API approach can capture frames at a rate of `~30` fps when the screen capture component is running on it's own thread. Furthermore, I intend on using a capture card to directly record frames at `>= 60` fps. The capture card approach is by far the most effective but has very demanding hardware and computational requirements. 
+- A single thread captures the active screen by taking a screenshot in a loop using the [win32api](https://github.com/mhammond/pywin32) for Windows or the [mss](https://github.com/BoboTiG/python-mss) screen capture library for MacOS or Linux. 
 
 
 ### Detection
@@ -19,9 +15,6 @@ The screen is captured using a loop that repeatedly takes a screen shot of the a
 ![Character Model Detection](images/example.png "Character Model Detection")
 
 ![Character Model Detection and Tracking](images/test2.gif "Character Model Detection and Tracking")
-
-https://www.youtube.com/watch?v=Zdq4AugZsUg
-
 
 This bot uses the [YOLOv5](https://pytorch.org/hub/ultralytics_yolov5/) object detection model to detect humanoid figures in captured frames. This network was trained using real world photographs of various scenes containing many different types of objects, including humans. This model can be used to detect humanoid character models in video game screen captures. However this model does not functional perfectly in the context of Destiny 2 and will miss some characters. In practice, any object detection model trained on photographs of humans should work in a video game context that uses humanoid character models.
 
@@ -46,16 +39,26 @@ The priority target is the character model who's bounding box has the largest ar
 Temp
 
 
+## Pitfalls 
+### Full and Partial Occlusion
+- Enemies behind cover (partial)
+- Enemies peek shooting (partial or full)
+- inability to detect enemies that arent on the screen (full)
+
+### False positives and False Negatives
+- Team mates are indistinguishable from enemies (false positive)
+- Non character models detected (false positive)
+- Missed character models (false negative)
+
+
 ## Hardware and Computational Requirements
 
-### Capture Card
-Temp
 
 ### GPU
 Temp
 
 ### FPS
-- `>= 60`
+- `>= 30`
 
 
 ## Potential Improvements and Future Work
