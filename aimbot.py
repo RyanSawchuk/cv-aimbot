@@ -116,9 +116,6 @@ def single_thread(sw, sh, mirror_scale, windowname):
     args["record"] = 'live_capture'
     args['togglekey'] = '~'
 
-    mask = np.zeros(sw, dtype=bool)
-    mask[range(520, 2400+520)] = True
-
     record = type(args['record']) == str
     if record:
         num = len([re.match(f'^{args["record"]}', f) for f in os.listdir("output")])
@@ -142,7 +139,6 @@ def single_thread(sw, sh, mirror_scale, windowname):
                 continue
             
             frame = capture.capture_frame()
-            #frame = frame[:,mask]
 
             if aimbot.is_active:
                 predictions = detector.detect(frame)
