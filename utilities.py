@@ -12,7 +12,6 @@ class Utilities:
     def __init__(self):
         pass
     
-
     @staticmethod
     def check_fps(input_video):
         cap = cv2.VideoCapture(input_video)

@@ -1,14 +1,10 @@
 import warnings
 warnings.filterwarnings("ignore")
 
-import os, sys
-import numpy as np
-
 import pyautogui
 import keyboard as kb
 import cv2
 import argparse
-import re
 
 from time import time, sleep
 from threading import Thread, Lock
@@ -18,29 +14,36 @@ from detection import Detection
 from vision import Vision
 from utilities import Utilities
 
-import win32gui
-
 pyautogui.PAUSE = 0
 
 
 class AimBot:
+    capture = None
+    detector = None
+    vision = None
 
     is_running = False
     is_active = False
+    is_single_thread = False
     lock = None
     state = None
 
     frame = None
     active_targets = None
     action_history = None
+    mirror_ratio = 1
     start_time = 0
 
-
-    def __init__(self):
+    def __init__(self, ist=True, mr=1):
         self.lock = Lock()
         self.active_targets = []
         self.action_history = []
-        self.start_time = time()
+        self.is_single_thread = ist
+        self.mirror_ratio = 1 / mr
+
+        self.capture = GameCapture(method='WIN32GUI')
+        self.detector = Detection()
+        self.vision = Vision()
 
     
     def shoot(self, target):
@@ -56,15 +59,69 @@ class AimBot:
             #pyautogui.click()
             self.action_history.append((time() - self.start_time, (0, 0)))
     
+    def user_kill_signal(self):
+        if kb.is_pressed(args['togglekey']):
+                self.is_active = not self.is_active
+        if kb.is_pressed('='):
+            self.stop()
+            return True
+        return False
+
+    def display(self, frame):
+        # TODO: write frames to video file if recording
+        cv2.imshow('MIRROR: ' + self.capture.windowname, cv2.resize(frame, (0,0), fx=self.mirror_ratio, fy=self.mirror_ratio))
+        if cv2.waitKey(1) & 0xFF == ord('='):
+            self.stop()
+
+    def run_single_thread(self):
+        while self.is_running:
+            try:
+                if self.user_kill_signal():
+                    break
+                frame = self.capture.capture_frame()
+
+                if self.is_active:
+                    predictions = self.detector.detect(frame)
+                    target = self.vision.get_priority_target(predictions)
+                    frame = self.vision.draw_bounding_boxes(frame, predictions)
+                    frame = self.vision.draw_crosshair(frame, target)
+
+                if target is not None:
+                    #self.shoot(target)
+                    pass
+
+                self.display(frame)
+                
+            except Exception as e:
+                print(e)
+                pass
+
+        #out.release()
+        cv2.destroyAllWindows()
+
+        with open('output/actions.txt', 'w') as f:
+            for action in self.action_history:
+                f.write(str(action))
+
+    def run(self):
+        while self.is_running:
+            # TODO: shoot active target
+            pass
 
     def start(self):
-        self.is_running = True
-        t = Thread(target=self.run)
-        t.start()
+        if not self.is_running:
+            self.is_running = True
+            self.start_time = time()
+            if self.is_single_thread:
+                self.run_single_thread()
+            else:
+                t = Thread(target=self.run)
+                t.start()
 
     def stop(self):
         self.lock.acquire()
         self.is_running = False
+        self.is_active = False
         self.lock.release()
     
     def update(self, frame):
@@ -84,146 +141,10 @@ class AimBot:
         self.lock.release()
         return active
 
-    def run(self):
-        while self.running:
-            # TODO: shoot active target
-            pass
 
-
-def main():
-
-    sw = pyautogui.size()[0]
-    sh = pyautogui.size()[1]
-
-    mr = 3
-    
-    wn = 'Play - Stadia - Google Chrome'
-    wn = 'Main Monitor'
-    #multi_thread(sw, sh, wn)
-
-    single_thread(sw, sh, mr, wn)
-
-
-# TODO: add this funtionality tot he aimbot class
-def single_thread(sw, sh, mirror_scale, windowname):
-
-    capture = GameCapture(sw, sh, windowname, 'WIN32GUI')
-    detector = Detection()
-    vision = Vision()
-    aimbot = AimBot()
-
-    # TODO: fix
-    args["record"] = 'live_capture'
-    args['togglekey'] = '~'
-
-    record = type(args['record']) == str
-    if record:
-        num = len([re.match(f'^{args["record"]}', f) for f in os.listdir("output")])
-        fps = Utilities.fps_test2(sw, sh)
-        print(f'FPS: {fps}')
-        out = cv2.VideoWriter(f'output/{args["record"]}-{num}.mp4', cv2.VideoWriter_fourcc(*'mp4v'), int(fps), (sw, sh))
-    
-    start_time = time()
-    frames = 0
-
-    running = True
-    while running:
-        frames += 1
-        try:
-
-            if kb.is_pressed(args['togglekey']):
-                aimbot.is_active = not aimbot.is_active
-            if kb.is_pressed('='):
-                running = False
-                aimbot.is_active = False
-                continue
-            
-            frame = capture.capture_frame()
-
-            if aimbot.is_active:
-                predictions = detector.detect(frame)
-
-                target = vision.get_priority_target(predictions)
-                frame = vision.draw_bounding_boxes(frame, predictions)
-                frame = vision.draw_crosshair(frame, target)
-
-                if target is not None:
-                    #aimbot.shoot(target)
-                    pass
-
-            if record:
-                out.write(frame)
-            
-            cv2.imshow('MIRROR: ' + windowname, cv2.resize(frame, (0,0), fx=1/mirror_scale, fy=1/mirror_scale))
-            if cv2.waitKey(25) & 0xFF == ord('='):
-                running = False
-        
-        except Exception as e:
-            print(e)
-            
-    run_time = time() - start_time
-    print(f'FPS: {frames / (run_time)}')
-
-    if record:
-        out.release()
-    cv2.destroyAllWindows()
-
-    with open('output/actions.txt', 'w') as f:
-        for action in aimbot.action_history:
-            f.write(str(action))
-
-
-# TODO: fix
-def multi_thread(sw, sh, windowname):
-
-    capture = GameCapture(sw, sh)
-    detector = Detection()
-    vision = Vision()
-    aimbot = AimBot()
-
-    record = type(args['record']) == str
-    if record:
-        num = len([re.match(f'^{args["record"]}', f) for f in os.listdir("output")])
-        fps = Utilities.fps_test(sw, sh)
-        out = cv2.VideoWriter(f'output/{args["record"]}-{num}.mp4', cv2.VideoWriter_fourcc(*'mp4v'), fps, (sw*2, sh*2))
-    
-    capture.start()
-    detector.start()
+def main():   
+    aimbot = AimBot(mr=3, ist=True)
     aimbot.start()
-
-    while True:
-        try:
-            if capture.frame is None:
-                continue
-            
-            detector.update(capture.frame)
-
-            # TODO: align bounding predictions with the correct frame OR reduce detect time by x10
-            target = vision.get_priority_target(detector.predictions)
-            frame = vision.draw_bounding_boxes(detector.frame, detector.predictions)
-            frame = vision.draw_crosshair(frame, target)
-
-            if target is not None:
-                aimbot.shoot(target)
-
-            if record:
-                out.write(frame)
-        
-        except Exception as e:
-            print(e)
-            pass
-    
-    capture.stop()
-    detector.stop()
-    aimbot.stop()
-
-    if record:
-        out.release()
-
-    with open('output/actions.txt', 'w') as f:
-        for action in aimbot.action_history:
-            f.write(str(action))
-    pass
 
 
 parser = argparse.ArgumentParser()

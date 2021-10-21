@@ -6,7 +6,6 @@ from time import time
 import torch
 
 class Detection:
-
     running = False
     lock = None
 
@@ -24,44 +23,35 @@ class Detection:
         self.lock = Lock()
         self.predictions = []
     
-
     def get_model_device(self):
         return next(self.model.parameters()).device.type
-
 
     def start(self):
         self.running = True
         t = Thread(target=self.run)
         t.start()
 
-
     def stop(self):
         self.running = False
-    
     
     def update(self, frame):
         self.lock.acquire()
         self.frame = frame
         self.lock.release()
 
-
     def run(self):
         while self.running:
             if self.frame is not None:
                 predictions = self.detect(self.frame)
-
                 self.lock.acquire()
                 self.predictions = predictions
                 self.lock.release()
 
-
     def detect(self, frame):
         return self.model(frame).pred[0].tolist()
 
-
     # TODO: refactor returned box format
     def track_objects(self, frame):
-
         max_objects = 16
         success = False
         predictions = None

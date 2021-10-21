@@ -24,7 +24,14 @@ def main():
     sh = pyautogui.size()[1] #win32api.GetSystemMetrics(0)
 
     #Utilities.fps_test(sw, sh, 'Play - Stadia - Google Chrome')
-    Utilities.process_video('Battlefield4-0.mp4')
+    filename = 'Battlefield4-0.mp4'
+    Utilities.process_video(filename)
+
+    filename = 'hitman3_dubia.mp4'
+    Utilities.process_video(filename)
+
+    filename = 'test0.mp4'
+    Utilities.process_video(filename)
 
     #record_window('Play - Stadia - Google Chrome', 'out')
     #single_frame_yolov5()
