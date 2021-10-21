@@ -60,12 +60,16 @@ class AimBot:
             self.action_history.append((time() - self.start_time, (0, 0)))
     
     def user_kill_signal(self):
-        if kb.is_pressed(args['togglekey']):
-                self.is_active = not self.is_active
+        if kb.is_pressed('-'):
+            self.toggle()
         if kb.is_pressed('='):
             self.stop()
             return True
         return False
+
+    def monitor_toggle_actions(self):
+        while self.is_running:
+            self.user_kill_signal()
 
     def display(self, frame):
         # TODO: write frames to video file if recording
@@ -112,8 +116,14 @@ class AimBot:
         if not self.is_running:
             self.is_running = True
             self.start_time = time()
+
+            #mt = Thread(target=self.monitor_toggle_actions)
+            #mt.start()
+
             if self.is_single_thread:
-                self.run_single_thread()
+                t = Thread(target=self.run_single_thread)
+                t.start()
+                #self.run_single_thread()
             else:
                 t = Thread(target=self.run)
                 t.start()
@@ -146,12 +156,11 @@ def main():
     aimbot = AimBot(mr=3, ist=True)
     aimbot.start()
 
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--record', metavar='<output video file name>', type=str, default=False, help='Record the live capture to an mp4 file.')
-parser.add_argument('--togglekey', metavar='<key bind>', type=str, default=False, help='Set the key bind for toggling the aimbot.')
-args = vars(parser.parse_args())
-
+def usage():
+    print('\033[96m'+'======================= '+'\033[91m'+'U S A G E'+'\033[96m'+' =======================\n'+'\033[0m')
+    print('\033[92m'+"\t\tExit key: '=' \n\t\tToggle firing key: '-'"+'\033[0m')
+    print('\033[96m'+'\n=========================================================='+'\033[0m')
 
 if __name__ == '__main__':
+    usage()
     main()

@@ -39,6 +39,12 @@ For an overview of how this aimbot functions, see the [METHODOLOGY.md](https://g
 python aimbot.py
 ```
 
+
+Exit key: ```'='```
+
+
+Toggle firing key: ```'-'```
+
 ## Acknowledgments
 
 * [YOLOv5](https://pytorch.org/hub/ultralytics_yolov5/)
