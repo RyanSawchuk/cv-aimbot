@@ -22,7 +22,7 @@ class Utilities:
     # Multi thread
     # TODO: Refactor
     @staticmethod
-    def fps_test(w, h, windowname = '', method = 'WIN32GUI'):
+    def fps_test(w, h, windowname = ''):
         # C: 162, 0.08039550722381215
         # D: 13, 0.774630069732666
 
@@ -39,7 +39,7 @@ class Utilities:
 
     # Single thread
     def fps_test2(sw, sh, windowname = '', method = 'WIN32GUI'):
-        capture = GameCapture(sw, sh, windowname, method)
+        capture = GameCapture(sw, sh, windowname)
         detector = Detection()
         vision = Vision()
 

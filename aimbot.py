@@ -2,10 +2,12 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import pyautogui
+import pydirectinput
+
 import keyboard as kb
 import cv2
-import argparse
 
+from sys import platform
 from time import time, sleep
 from threading import Thread, Lock
 
@@ -13,9 +15,6 @@ from gamecapture import GameCapture
 from detection import Detection
 from vision import Vision
 from utilities import Utilities
-
-pyautogui.PAUSE = 0
-
 
 class AimBot:
     capture = None
@@ -41,23 +40,24 @@ class AimBot:
         self.is_single_thread = ist
         self.mirror_ratio = 1 / mr
 
-        self.capture = GameCapture(method='WIN32GUI')
+        self.capture = GameCapture()
         self.detector = Detection()
         self.vision = Vision()
 
     
     def shoot(self, target):
-        # TODO: PyDirectInput for DirectX on windows
-        # TODO: Check that the target is within screen bounds
         try:
-            pyautogui.moveTo(target[0], target[1])
-            pyautogui.click()
-            self.action_history.append((time() - self.start_time, target))
+            if (target[0] < self.capture.w - 20 and target[0] > 20) \
+                and (target[1] < self.capture.h - 20 and target[1] > 20):
+                gui.moveTo(target[0], target[1])
+                gui.click()
+                self.action_history.append((time() - self.start_time, target))
+            else:
+                raise Exception('Target out of screen bounds.')
 
-        except pyautogui.FailSafeException as e:
-            pyautogui.moveTo(0, 0)
-            #pyautogui.click()
-            self.action_history.append((time() - self.start_time, (0, 0)))
+        except Exception as e:
+            gui.moveTo(self.capture.w/2, self.capture.h/2)
+            self.action_history.append((time() - self.start_time, ('OOB')))
     
     def user_kill_signal(self):
         if kb.is_pressed('-'):
@@ -90,9 +90,8 @@ class AimBot:
                     frame = self.vision.draw_bounding_boxes(frame, predictions)
                     frame = self.vision.draw_crosshair(frame, target)
 
-                if target is not None:
-                    #self.shoot(target)
-                    pass
+                    if target is not None:
+                        self.shoot(target)
 
                 self.display(frame)
                 
@@ -161,6 +160,14 @@ def usage():
     print('\033[92m'+"\t\tExit key: '=' \n\t\tToggle firing key: '-'"+'\033[0m')
     print('\033[96m'+'\n=========================================================='+'\033[0m')
 
+gui = None
 if __name__ == '__main__':
+    if platform == "win32":
+        gui = pydirectinput
+    else:
+        gui = pyautogui
+    
+    gui.PAUSE = 0
+
     usage()
     main()

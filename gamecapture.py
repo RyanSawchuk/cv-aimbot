@@ -3,6 +3,7 @@ import cv2
 import pyautogui
 from threading import Thread, Lock
 
+from sys import platform
 from PIL import Image
 from time import time
 from mss import mss
@@ -24,20 +25,23 @@ class GameCapture:
     w = 0
     h = 0
 
-    def __init__(self, w = pyautogui.size()[0], h = pyautogui.size()[1], windowname = '', method = 'PIL'):
+    def __init__(self, w = pyautogui.size()[0], h = pyautogui.size()[1], windowname = ''):        
+        if platform == "darwin":
+            h = h/2
+            w = w/2
+            self.screen_capture = mss()
+            self.capture_frame = self.capture_frame_by_PIL
+        elif platform == "win32":
+            self.capture_frame = self.capture_frame_by_WIN32
+        else:
+            self.screen_capture = mss()
+            self.capture_frame = self.capture_frame_by_PIL
+
         self.lock = Lock()
         self.capture_area = {"left": 0, "top": 0, "width": w, "height": h}
         self.w = w
         self.h = h
         self.windowname = windowname
-
-        if method == 'PIL':
-            self.capture_frame = self.capture_frame_by_PIL
-            self.screen_capture = mss()
-        elif method == 'WIN32GUI':
-            self.capture_frame = self.capture_frame_by_WIN32
-        else:
-            self.capture_frame = self.capture_frame_by_PIL
 
     def start(self):
         self.running = True

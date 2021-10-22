@@ -45,6 +45,16 @@ Exit key: ```'='```
 
 Toggle firing key: ```'-'```
 
+
+## Road Map
+- CLI argument for mirror screen size.
+- Record filtered screen capture.
+
+## Known Issues
+- Finiky toggle firing key.
+- Some applications dont allow mouse movements.
+
+
 ## Acknowledgments
 
 * [YOLOv5](https://pytorch.org/hub/ultralytics_yolov5/)

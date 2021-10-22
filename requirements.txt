@@ -1,7 +1,9 @@
-torch==1.9.1
 PyAutoGUI==0.9.48
-pandas==1.2.4
-numpy==1.20.1
-pywin32==227
 mss==6.1.0
-Pillow==8.3.2
+pandas==1.2.4
+torch==1.9.1
+numpy==1.20.1
+keyboard==0.13.5
+PyDirectInput==1.0.4
+pywin32==227
+Pillow==8.4.0
